@@ -33,19 +33,18 @@ var hashes = Promise.map(resolutions, function(resolution) {
     });
 });
 
-console.log('Calculating hashes at the following resolutions: ' + resolutions + '\n');
-
 Promise.all(hashes).then(function(hashSets) {
-    var format = '%-32s %-6s %-6s %s';
-    console.log(sprintf(format, 'Input', '8', '4', '3'));
-    console.log(sprintf('------------------------------------------------'));
+    console.log('\nHashes / Hamming distance from original at respective resolutions:\n');
+    console.log(sprintf('%-32s %-24s %-24s %s', 'Input', '8', '4', '3'));
+    console.log(sprintf('-------------------------------------------------------------------------------------------------------'));
     for (var i = 0; i < files.length; i++) {
-        console.log(sprintf('%-32s %-6d %-6d %d',
+        console.log(sprintf(
+            '%-32s %s / %-5d %s / %-5d %s / %d',
             files[i],
-            hd(hashSets[0][0], hashSets[0][i]),
-            hd(hashSets[1][0], hashSets[1][i]),
-            hd(hashSets[2][0], hashSets[2][i])
+            hashSets[0][i].toString('hex'), hd(hashSets[0][0], hashSets[0][i]),
+            hashSets[1][i].toString('hex'), hd(hashSets[1][0], hashSets[1][i]),
+            hashSets[2][i].toString('hex'), hd(hashSets[2][0], hashSets[2][i])
         ));
     }
-    console.log('\nNumbered columns indicate Hamming distance from original image at respective resolutions.');
+    console.log('\n');
 });
