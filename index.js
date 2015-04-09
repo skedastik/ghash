@@ -13,7 +13,8 @@ function GHash(input) {
     }
     this.input = input;
     this.options = {
-        resolution: MAX_RESOLUTION
+        resolution: MAX_RESOLUTION,
+        fuzziness: 0
     };
     return this;
 }
@@ -24,15 +25,22 @@ GHash.prototype.resolution = function(resolution) {
     }
     this.options.resolution = resolution;
     return this;
-}
+};
 
 GHash.prototype.debugOut = function(pathAndPrefix) {
     this.options.debugOut = pathAndPrefix;
     return this;
-}
+};
+
+GHash.prototype.fuzziness = function(fuzziness) {
+    this.options.fuzziness = fuzziness;
+    return this;
+};
 
 GHash.prototype.calculate = function(callback) {
+    var that = this;
     var image = sharp(this.input)
+    // note: choice of interpolator affects hash value
     .interpolateWith(sharp.interpolator.bilinear)
     .resize(this.options.resolution, this.options.resolution)
     .flatten()
@@ -45,7 +53,9 @@ GHash.prototype.calculate = function(callback) {
     var hash = image
     .raw()
     .toBuffer()
-    .then(calculateHash);
+    .then(function(buf) {
+        return calculateHash(buf, that.options.fuzziness);
+    });
     
     if (callback) {
         return hash.then(function(hash) {
@@ -55,9 +65,9 @@ GHash.prototype.calculate = function(callback) {
     }
     
     return hash;
-}
+};
 
-function calculateHash(inputBuf) {
+function calculateHash(inputBuf, fuzziness) {
     var outputBuf = new Buffer(OUTPUT_BUF_SIZE);
     var octet = 0;
     var bit = 0;
@@ -65,7 +75,7 @@ function calculateHash(inputBuf) {
     outputBuf.fill(0);
     // calculate hash from luminosity gradient
     for (var i = 0; i < iters; i++) {
-        if (inputBuf[i] < inputBuf[i + 1]) {
+        if (inputBuf[i + 1] - inputBuf[i] > fuzziness) {
             outputBuf[octet] |= 1 << bit;
         }
         if (++bit == 8) {

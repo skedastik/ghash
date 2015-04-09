@@ -6,8 +6,10 @@ var Promise = require('bluebird');
 var ghash = require('./index');
 
 var BASE_PATH = 'test/sample/';
+var EXTENSION = '.jpg';
+
+var fuzzinesses = [0, 5, 10];
 var resolutions = [8, 4, 3];
-var extension = '.jpg';
 var files = [
     'orig',
     'attacked-compressed',
@@ -23,30 +25,36 @@ var files = [
     'attacked-sheared',
     'attacked-crop-centered',
     'attacked-rotated',
-    'control',
+    'control'
 ];
 
-var hashes = Promise.map(resolutions, function(resolution) {
-    return Promise.map(files, function(filename) {  
-        return ghash(BASE_PATH + filename + extension)
-        .resolution(resolution)
-        .debugOut('var/' + filename)
-        .calculate();
+var hashes = Promise.map(fuzzinesses, function(fuzziness) {
+    return Promise.map(resolutions, function(resolution) {
+        return Promise.map(files, function(filename) {  
+            return ghash(BASE_PATH + filename + EXTENSION)
+            .resolution(resolution)
+            // .debugOut('var/' + filename)
+            .fuzziness(fuzziness)
+            .calculate();
+        });
     });
 });
 
 Promise.all(hashes).then(function(hashSets) {
-    console.log('\nHashes / Hamming distance from original at respective resolutions:\n');
-    console.log(sprintf('%-32s %-24s %-24s %s', 'Input', '8', '4', '3'));
-    console.log(sprintf('-------------------------------------------------------------------------------------------------------'));
-    for (var i = 0; i < files.length; i++) {
-        console.log(sprintf(
-            '%-32s %s / %-5d %s / %-5d %s / %d',
-            files[i],
-            hashSets[0][i].toString('hex'), hd(hashSets[0][0], hashSets[0][i]),
-            hashSets[1][i].toString('hex'), hd(hashSets[1][0], hashSets[1][i]),
-            hashSets[2][i].toString('hex'), hd(hashSets[2][0], hashSets[2][i])
-        ));
+    console.log('(Hashes / Hamming distance) at...\n');
+    for (var j = 0; j < fuzzinesses.length; j++) {
+        console.log('fuzziness = ' + fuzzinesses[j] + '\n');
+        console.log(sprintf('    %-32s %-24s %-24s %s', 'Input', 'resolution = 8', 'resolution = 4', 'resolution = 3'));
+        console.log(sprintf('    -------------------------------------------------------------------------------------------------------'));
+        for (var i = 0; i < files.length; i++) {
+            console.log(sprintf(
+                '    %-32s %s / %-5d %s / %-5d %s / %d',
+                files[i],
+                hashSets[j][0][i].toString('hex'), hd(hashSets[j][0][0], hashSets[j][0][i]),
+                hashSets[j][1][i].toString('hex'), hd(hashSets[j][1][0], hashSets[j][1][i]),
+                hashSets[j][2][i].toString('hex'), hd(hashSets[j][2][0], hashSets[j][2][i])
+            ));
+        }
+        console.log('');
     }
-    console.log('');
 });
