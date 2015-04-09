@@ -1,27 +1,60 @@
 var sharp = require('sharp');
+var Promise = require('bluebird');
 
-module.exports = ghash;
+module.exports = GHash;
 
 var MIN_RESOLUTION  = 2;
 var MAX_RESOLUTION  = 8;
 var OUTPUT_BUF_SIZE = MAX_RESOLUTION * MAX_RESOLUTION / 8;
 
-// generate a 64-bit hash given an input image (buffer or file path)
-function ghash(input, resolution, callback) {
+function GHash(input) {
+    if (!(this instanceof GHash)) {
+        return new GHash(input);
+    }
+    this.input = input;
+    this.options = {
+        resolution: MAX_RESOLUTION
+    };
+    return this;
+}
+
+GHash.prototype.resolution = function(resolution) {
     if (resolution > MAX_RESOLUTION || resolution < MIN_RESOLUTION) {
         throw 'Invalid resolution (' + resolution + ') passed to ghash';
     }
-    // normalize before processing
-    sharp(input)
+    this.options.resolution = resolution;
+    return this;
+}
+
+GHash.prototype.debugOut = function(pathAndPrefix) {
+    this.options.debugOut = pathAndPrefix;
+    return this;
+}
+
+GHash.prototype.calculate = function(callback) {
+    var image = sharp(this.input)
     .interpolateWith(sharp.interpolator.bilinear)
-    .resize(resolution, resolution)
+    .resize(this.options.resolution, this.options.resolution)
     .flatten()
-    .grayscale()
+    .grayscale();
+    
+    if (this.options.debugOut) {
+        image.toFile(this.options.debugOut + '-ghash' + this.options.resolution + '.png');
+    }
+    
+    var hash = image
     .raw()
     .toBuffer()
-    .then(calculateHash)
-    .then(function(hash) { callback(null, hash); })
-    .error(callback);
+    .then(calculateHash);
+    
+    if (callback) {
+        return hash.then(function(hash) {
+            callback(null, hash);
+        })
+        .error(callback);
+    }
+    
+    return hash;
 }
 
 function calculateHash(inputBuf) {
