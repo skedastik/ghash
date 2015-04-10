@@ -1,6 +1,6 @@
 {
   "name": "ghash",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Generate fuzzy hashes for images",
   "main": "index.js",
   "scripts": {
