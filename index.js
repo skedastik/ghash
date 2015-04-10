@@ -6,6 +6,8 @@ module.exports = GHash;
 var MIN_RESOLUTION  = 2;
 var MAX_RESOLUTION  = 8;
 var OUTPUT_BUF_SIZE = MAX_RESOLUTION * MAX_RESOLUTION / 8;
+var MIN_FUZZINESS   = 0;
+var MAX_FUZZINESS   = 255;
 
 function GHash(input) {
     if (!(this instanceof GHash)) {
@@ -33,6 +35,9 @@ GHash.prototype.debugOut = function(pathAndPrefix) {
 };
 
 GHash.prototype.fuzziness = function(fuzziness) {
+    if (fuzziness > MAX_FUZZINESS || fuzziness < MIN_FUZZINESS) {
+        throw 'Invalid resolution (' + fuzziness + ') passed to ghash';
+    }
     this.options.fuzziness = fuzziness;
     return this;
 };
@@ -45,6 +50,8 @@ GHash.prototype.calculate = function(callback) {
     .resize(this.options.resolution, this.options.resolution)
     .flatten()
     .grayscale();
+    
+    // TODO: An additional dynamic-range normalization pass (essentially zero-mean + feature-scaling) would probably be helpful here, as a static `fuzziness` value will have disproportionate effect for low vs. high contrast images.
     
     if (this.options.debugOut) {
         image.toFile(this.options.debugOut + '-ghash' + this.options.resolution + '.png');
