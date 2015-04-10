@@ -158,7 +158,7 @@ ghash converts to grayscale not only to simplify the algorithm, but because huma
 
 Downscaling is necessary to compress the hash to 64 bits or less. The `resolution` value determines the final size of the downsized image.
 
-#### 2. Processing via luminosity gradient
+#### 2. Hash calculation via luminosity gradient
 
 Now that ghash has a preprocessed image, it can begin calculating the hash value. It does so by calculating the difference in luminosity between every pixel in the image and its immediate neighbor. If the neighboring pixel is "brighter" by some threshold (the `fuzziness` value), the corresponding bit in the output buffer is set to 1, otherwise 0.
 
