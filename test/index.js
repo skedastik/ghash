@@ -4,6 +4,7 @@ var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 var Promise = require('bluebird');
 var ghash = require('../index');
+var hammingDistance = require('hamming-distance');
 
 chai.use(chaiAsPromised);
 chai.should();
@@ -33,12 +34,21 @@ describe('ghash', function() {
         }).should.eventually.equal(0);
     });
 
-    it('should generate different hashes for different images', function() {
+    it('should generate very different hashes for very different images', function() {
         return Promise.all([
             ghash('test/sample/orig.jpg').calculate(),
             ghash('test/sample/control.jpg').calculate()
         ]).then(function(hashes) {
-            return Buffer.compare(hashes[0], hashes[1]);
-        }).should.eventually.not.equal(0);
+            return hammingDistance(hashes[0].toString('hex'), hashes[1].toString('hex'));
+        }).should.eventually.be.above(16);
+    });
+    
+    it('should generate similar hashes for similar images', function() {
+        return Promise.all([
+            ghash('test/sample/orig.jpg').calculate(),
+            ghash('test/sample/attacked-compressed.jpg').calculate()
+        ]).then(function(hashes) {
+            return hammingDistance(hashes[0].toString('hex'), hashes[1].toString('hex'));
+        }).should.eventually.be.below(8);
     });
 });

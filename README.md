@@ -53,6 +53,7 @@ Valid values are in the range [0-255], inclusive. The default fuzziness value is
 * ghash works well for tiny images.
     - [pHash](http://www.phash.org/), which is fantastic, doesn't work well for tiny images in my experience. Even for 4x4-pixel images that are nearly perceptually identical, pHash generates vastly different hashes. Theoretically, ghash could synergize nicely with pHash.
 * ghash's "fuzziness" can be tuned (see Hash Characteristics).
+    - For instance, similar input images can be reduced to _identical_ "archetypes" (potentially useful for similarity search space reduction).
 * ghash is fairly resilient to various attacks (see Resilience).
 
 ### Hash Characteristics
@@ -155,7 +156,7 @@ This involves two steps: conversion to grayscale, and down-scaling.
 
 ghash converts to grayscale not only to simplify the algorithm, but because human sight relies almost entirely on luminosity to recognize images.
 
-With aggressive downscaling, ghash can be used to reduce images to an "archetype". Ideally, similar input images reduce to _identical_ archetypes (this is where the `resolution` value comes into play).
+Downscaling is necessary to compress the hash to 64 bits or less. The `resolution` value determines the final size of the downsized image.
 
 #### 2. Processing via luminosity gradient
 
