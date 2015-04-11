@@ -54,7 +54,7 @@ GHash.prototype.calculate = function(callback) {
     // TODO: An additional dynamic-range normalization pass (essentially zero-mean + feature-scaling) would probably be helpful here, as a static `fuzziness` value will have disproportionate effect for low vs. high contrast images.
     
     if (this.options.debugOut) {
-        image.toFile(this.options.debugOut + '-ghash' + this.options.resolution + '.png');
+        image.toFile(this.options.debugOut + '.png');
     }
     
     var hash = image
