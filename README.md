@@ -4,7 +4,7 @@ ghash generates fuzzy hashes from images. That is, it generates similar hashes f
 
 ## Usage
 
-ghash makes use of features from [sharp](https://github.com/lovell/sharp) requiring [libvips](https://github.com/jcupitt/libvips) v7.42.0+.
+ghash makes use of features from [sharp][sharp-url] requiring [libvips][libvips-url] v7.42.0+.
 
 ### Overview
 
@@ -170,6 +170,10 @@ By examining these "deltas", the algorithm is essentially performing edge-detect
 
 * If ghash is used for search-space reduction, even a single false negative is bad. False positives are okay. This means you should tune aggressively for minimizing false negatives, even at the expense of increasing false positives. Elimination of all false negatives cannot be guaranteed. :(
 
+* Because ghash uses [sharp][sharp-url]/[libvips][libvips-url] to preprocess images, changes to either library may result in tiny changes to the hashes produced.
+
 * Because of ghash's simplicity, it has the potential to be lightning-fast. This implementation is slow. Ideally, ghash would be a native, multithreaded library.
 
 [study-url]: https://github.com/skedastik/ghash-profile/blob/master/README.md
+[sharp-url]: https://github.com/lovell/sharp
+[libvips-url]: https://github.com/jcupitt/libvips
