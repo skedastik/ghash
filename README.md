@@ -53,7 +53,7 @@ Valid values are in the range [0-255], inclusive. The default fuzziness value is
 * ghash works well for tiny images.
     - [pHash](http://www.phash.org/), which is fantastic, doesn't work well for tiny images in my experience. Even for 4x4-pixel images that are nearly perceptually identical, pHash generates vastly different hashes. Theoretically, ghash could synergize nicely with pHash.
 * ghash's "fuzziness" can be tuned (see Hash Characteristics).
-    - ~~For instance, similar input images can be reduced to _identical_ "archetypes" (potentially useful for similarity search space reduction~~). In its current form, ghash generates too few hash collisions to reliably "bucket" images into archetypal hashes. This makes it unsuitable for similarity search space reduction. See [STUDY.md](STUDY.md) for details.
+    - ~~For instance, similar input images can be reduced to _identical_ "archetypes" (potentially useful for similarity search space reduction~~). In its current form, ghash generates too few hash collisions to reliably "bucket" images into archetypal hashes. This makes it unsuitable for similarity search space reduction. See [this study][study-url] for details.
 * ghash is fairly resilient to various attacks (see Resilience).
 
 ### Hash Characteristics
@@ -166,8 +166,10 @@ By examining these "deltas", the algorithm is essentially performing edge-detect
 
 ### Caveats
 
-* The above results are not scientific. The sample size used to explore ghash is too small to form serious conclusions. See [STUDY.md](STUDY.md) for more comprehensive coverage.
+* The above results are not scientific. The sample size used to explore ghash is too small to form serious conclusions. See [this study][study-url] for more comprehensive coverage.
 
 * If ghash is used for search-space reduction, even a single false negative is bad. False positives are okay. This means you should tune aggressively for minimizing false negatives, even at the expense of increasing false positives. Elimination of all false negatives cannot be guaranteed. :(
 
 * Because of ghash's simplicity, it has the potential to be lightning-fast. This implementation is slow. Ideally, ghash would be a native, multithreaded library.
+
+[study-url]: https://github.com/skedastik/ghash-profile/blob/master/README.md
