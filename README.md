@@ -154,13 +154,13 @@ ghash works in two stages.
 
 This involves two steps: conversion to grayscale, and down-scaling.
 
-ghash converts to grayscale not only to simplify the algorithm, but because human sight relies almost entirely on luminosity to recognize images.
+ghash converts to grayscale not only to simplify the algorithm, but because human sight relies almost entirely on luminance to recognize images.
 
 Downscaling is necessary to compress the hash to 64 bits or less. The `resolution` value determines the final size of the downsized image.
 
-#### 2. Hash calculation via luminosity gradient
+#### 2. Hash calculation via luminance gradient
 
-Now that ghash has a preprocessed image, it can begin calculating the hash value. It does so by calculating the difference in luminosity between every pixel in the image and its immediate neighbor. If the neighboring pixel is "brighter" by some threshold (the `fuzziness` value), the corresponding bit in the output buffer is set to 1, otherwise 0.
+Now that ghash has a preprocessed image, it can begin calculating the hash value. It does so by calculating the difference in luminance between every pixel in the image and its immediate neighbor. If the neighboring pixel is "brighter" by some threshold (the `fuzziness` value), the corresponding bit in the output buffer is set to 1, otherwise 0.
 
 By examining these "deltas", the algorithm is essentially performing edge-detection, the basis of image recognition. A higher `fuzziness` value equates to a higher edge-detection threshold.
 

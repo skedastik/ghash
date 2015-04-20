@@ -80,7 +80,7 @@ function calculateHash(inputBuf, fuzziness) {
     var bit = 0;
     var iters = inputBuf.length - 1;
     outputBuf.fill(0);
-    // calculate hash from luminosity gradient
+    // calculate hash from luminance gradient
     for (var i = 0; i < iters; i++) {
         if (inputBuf[i + 1] - inputBuf[i] > fuzziness) {
             outputBuf[octet] |= 1 << bit;
