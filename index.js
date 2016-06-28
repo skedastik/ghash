@@ -46,8 +46,7 @@ GHash.prototype.calculate = function(callback) {
     var that = this;
     var image = sharp(this.input)
     // note: choice of interpolator affects hash value
-    .interpolateWith(sharp.interpolator.bilinear)
-    .resize(this.options.resolution, this.options.resolution)
+    .resize(this.options.resolution, this.options.resolution, { interpolator: sharp.interpolator.bilinear })
     .flatten()
     .grayscale();
     
