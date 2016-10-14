@@ -90,7 +90,7 @@ function calculateHash(inputBuf, fuzziness) {
         }
     }
     // wrap to first pixel
-    if (inputBuf[i] < inputBuf[0]) {
+    if (inputBuf[0] - inputBuf[i] > fuzziness) {
         outputBuf[octet] |= 1 << bit;
     }
     return outputBuf;
