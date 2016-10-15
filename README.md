@@ -39,7 +39,7 @@ ghash('path/to/image.jpg')
 
 #### Resolution
 
-Valid values are in the range [2-8], inclusive. ghash always generates a 64-bit Buffer, but depending on resolution, not all bits are utilized. The default resolution is 8, utilizing all 64 bits. Smaller resolutions increase fuzziness (see Supplemental).
+Valid values are in the range [2-32], inclusive. ghash always generates a full-sized buffer, but depending on resolution, not all bits are utilized. The default resolution is 8, utilizing all bits. Smaller resolutions increase fuzziness (see Supplemental).
 
 #### Fuzziness
 

@@ -4,7 +4,8 @@ var Promise = require('bluebird');
 module.exports = GHash;
 
 var MIN_RESOLUTION  = 2;
-var MAX_RESOLUTION  = 8;
+var MAX_RESOLUTION  = 32;
+var DEFAULT_RESOLUTION = 8;
 var OUTPUT_BUF_SIZE = MAX_RESOLUTION * MAX_RESOLUTION / 8;
 var MIN_FUZZINESS   = 0;
 var MAX_FUZZINESS   = 255;
@@ -15,7 +16,7 @@ function GHash(input) {
     }
     this.input = input;
     this.options = {
-        resolution: MAX_RESOLUTION,
+        resolution: DEFAULT_RESOLUTION,
         fuzziness: 0
     };
     return this;
@@ -49,27 +50,27 @@ GHash.prototype.calculate = function(callback) {
     .resize(this.options.resolution, this.options.resolution, { interpolator: sharp.interpolator.bilinear })
     .flatten()
     .grayscale();
-    
+
     // TODO: An additional dynamic-range normalization pass (essentially zero-mean + feature-scaling) would probably be helpful here, as a static `fuzziness` value will have disproportionate effect for low vs. high contrast images.
-    
+
     if (this.options.debugOut) {
         image.toFile(this.options.debugOut + '.png');
     }
-    
+
     var hash = image
     .raw()
     .toBuffer()
     .then(function(buf) {
         return calculateHash(buf, that.options.fuzziness);
     });
-    
+
     if (callback) {
         return hash.then(function(hash) {
             callback(null, hash);
         })
         .error(callback);
     }
-    
+
     return hash;
 };
 
@@ -81,7 +82,7 @@ function calculateHash(inputBuf, fuzziness) {
     outputBuf.fill(0);
     // calculate hash from luminance gradient
     for (var i = 0; i < iters; i++) {
-        if (inputBuf[i + 1] - inputBuf[i] > fuzziness) {
+        if (Math.abs(inputBuf[i + 1] - inputBuf[i]) > fuzziness) {
             outputBuf[octet] |= 1 << bit;
         }
         if (++bit == 8) {
@@ -90,7 +91,7 @@ function calculateHash(inputBuf, fuzziness) {
         }
     }
     // wrap to first pixel
-    if (inputBuf[0] - inputBuf[i] > fuzziness) {
+    if (Math.abs(inputBuf[0] - inputBuf[i]) > fuzziness) {
         outputBuf[octet] |= 1 << bit;
     }
     return outputBuf;
