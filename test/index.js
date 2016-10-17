@@ -11,24 +11,24 @@ chai.should();
 
 describe('ghash', function() {
     it('should fail when given a bad input image', function() {
-        return ghash('test/sample/nonexistent.png').calculate().should.eventually.be.rejected;
+        return ghash('test/sample/nonexistent.png').fuzziness(32).calculate().should.eventually.be.rejected;
     });
-    
+
     it('should succeed when given an a valid input image', function() {
-        return ghash('test/sample/solid.png').calculate().should.eventually.be.fulfilled;
+        return ghash('test/sample/solid.png').fuzziness(32).calculate().should.eventually.be.fulfilled;
     });
-    
+
     it('should return a zeroed-out hash for a solid input image', function() {
         var zeroBuffer = new Buffer([0,0,0,0,0,0,0,0]);
         return ghash('test/sample/solid.png')
-        .calculate()
+        .fuzziness(32).calculate()
         .call('compare', zeroBuffer).should.eventually.equal(0);
     });
 
     it('should generate identical hashes for identical images', function() {
         return Promise.all([
-            ghash('test/sample/orig.jpg').calculate(),
-            ghash('test/sample/orig-copy.jpg').calculate()
+            ghash('test/sample/orig.jpg').fuzziness(32).calculate(),
+            ghash('test/sample/orig-copy.jpg').fuzziness(32).calculate()
         ]).then(function(hashes) {
             return Buffer.compare(hashes[0], hashes[1]);
         }).should.eventually.equal(0);
@@ -36,17 +36,17 @@ describe('ghash', function() {
 
     it('should generate very different hashes for very different images', function() {
         return Promise.all([
-            ghash('test/sample/orig.jpg').calculate(),
-            ghash('test/sample/control.jpg').calculate()
+            ghash('test/sample/orig.jpg').fuzziness(32).calculate(),
+            ghash('test/sample/control.jpg').fuzziness(32).calculate()
         ]).then(function(hashes) {
             return hammingDistance(hashes[0].toString('hex'), hashes[1].toString('hex'));
         }).should.eventually.be.above(16);
     });
-    
+
     it('should generate similar hashes for similar images', function() {
         return Promise.all([
-            ghash('test/sample/orig.jpg').calculate(),
-            ghash('test/sample/attacked-compressed.jpg').calculate()
+            ghash('test/sample/orig.jpg').fuzziness(32).calculate(),
+            ghash('test/sample/attacked-compressed.jpg').fuzziness(32).calculate()
         ]).then(function(hashes) {
             return hammingDistance(hashes[0].toString('hex'), hashes[1].toString('hex'));
         }).should.eventually.be.below(8);

@@ -6,7 +6,6 @@ module.exports = GHash;
 var MIN_RESOLUTION  = 2;
 var MAX_RESOLUTION  = 32;
 var DEFAULT_RESOLUTION = 8;
-var OUTPUT_BUF_SIZE = MAX_RESOLUTION * MAX_RESOLUTION / 8;
 var MIN_FUZZINESS   = 0;
 var MAX_FUZZINESS   = 255;
 
@@ -61,7 +60,7 @@ GHash.prototype.calculate = function(callback) {
     .raw()
     .toBuffer()
     .then(function(buf) {
-        return calculateHash(buf, that.options.fuzziness);
+        return calculateHash(buf, that.options.resolution, that.options.fuzziness);
     });
 
     if (callback) {
@@ -74,8 +73,8 @@ GHash.prototype.calculate = function(callback) {
     return hash;
 };
 
-function calculateHash(inputBuf, fuzziness) {
-    var outputBuf = new Buffer(OUTPUT_BUF_SIZE);
+function calculateHash(inputBuf, resolution, fuzziness) {
+    var outputBuf = new Buffer(resolution * resolution / 8);
     var octet = 0;
     var bit = 0;
     var iters = inputBuf.length - 1;
