@@ -74,13 +74,14 @@ GHash.prototype.calculate = function(callback) {
 };
 
 function calculateHash(inputBuf, resolution, fuzziness) {
-    var outputBuf = new Buffer(resolution * resolution / 8);
+    var outputBuf = new Buffer(2 * resolution * resolution / 8);
+    outputBuf.fill(0);
+
     var octet = 0;
     var bit = 0;
-    var iters = inputBuf.length - 1;
-    outputBuf.fill(0);
-    // calculate hash from luminance gradient
-    for (var i = 0; i < iters; i++) {
+
+    // calculate 1st half of hash, scanning horizontally
+    for (var i = 0; i < inputBuf.length - 1; i++) {
         if (Math.abs(inputBuf[i + 1] - inputBuf[i]) > fuzziness) {
             outputBuf[octet] |= 1 << bit;
         }
@@ -89,9 +90,31 @@ function calculateHash(inputBuf, resolution, fuzziness) {
             bit = 0;
         }
     }
-    // wrap to first pixel
+    // wrap to top-left pixel
     if (Math.abs(inputBuf[0] - inputBuf[i]) > fuzziness) {
         outputBuf[octet] |= 1 << bit;
     }
+
+    // calculate 2nd half of hash, scanning vertically
+    var iv = [];
+    for (var x = resolution - 1; x >= 0; x--) {
+        for (var y = 0; y < resolution; y++) {
+            iv.push(y * 4 + x);
+        }
+    }
+    for (var i = 0; i < iv.length - 1; i++) {
+        if (Math.abs(inputBuf[iv[i + 1]] - inputBuf[iv[i]]) > fuzziness) {
+            outputBuf[octet] |= 1 << bit;
+        }
+        if (++bit == 8) {
+            octet++;
+            bit = 0;
+        }
+    }
+    // wrap to top-right pixel
+    if (Math.abs(inputBuf[iv[0]] - inputBuf[iv[i]]) > fuzziness) {
+        outputBuf[octet] |= 1 << bit;
+    }
+
     return outputBuf;
 }

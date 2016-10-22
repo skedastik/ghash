@@ -19,7 +19,7 @@ describe('ghash', function() {
     });
 
     it('should return a zeroed-out hash for a solid input image', function() {
-        var zeroBuffer = new Buffer([0,0,0,0,0,0,0,0]);
+        var zeroBuffer = new Buffer([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
         return ghash('test/sample/solid.png')
         .fuzziness(32).calculate()
         .call('compare', zeroBuffer).should.eventually.equal(0);
