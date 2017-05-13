@@ -67,7 +67,7 @@ GHash.prototype.calculate = function(callback) {
         return hash.then(function(hash) {
             callback(null, hash);
         })
-        .error(callback);
+        .catch(callback);
     }
     
     return hash;
